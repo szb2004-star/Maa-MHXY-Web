@@ -1,6 +1,7 @@
 'use strict';
 /* Presentation and navigation only: no emulator or task is started by this file. */
 (() => {
+  let taskIcons={};
   const viewLabels={devices:'模拟器总览',profiles:'任务配置',activity:'活动日志',accounts:'账号中心',monitor:'监控中心'};
   const symbolPaths={devices:'<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4"/>',profiles:'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8m-8 4h8m-8 4h4"/>',activity:'<path d="M4 5h16M4 12h16M4 19h16"/>',accounts:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',monitor:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',search:'<circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/>',plus:'<path d="M12 4v16M4 12h16"/>',book:'<path d="M12 5C9 3 5 3 2 4v15c3-1 7-1 10 1 3-2 7-2 10-1V4c-3-1-7-1-10 1Zm0 0v15"/>',team:'<circle cx="9" cy="8" r="3"/><path d="M2 21v-2a7 7 0 0 1 14 0v2M17 5a3 3 0 0 1 0 6m2 3a6 6 0 0 1 3 5v2"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h2m4 0h2"/>',spark:'<path d="m12 2 2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5L12 2Zm7 15 1 2 2 1-2 1-1 2-1-2-2-1 2-1Z"/>',bag:'<rect x="4" y="7" width="16" height="14" rx="3"/><path d="M8 7V5a4 4 0 0 1 8 0v2m-8 6h8m-4-2v4"/>'};
   function icon(name){const span=el('span');span.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true">${symbolPaths[name]||symbolPaths.book}</svg>`;return span;}
@@ -153,7 +154,13 @@
         const tile=button('','workspace-task-tile',async()=>{if(draggingTask||Date.now()-dragEndedAt<300)return;previewTask=task;previewTitle.textContent=task.name;previewDescription.textContent='正在读取任务说明…';if(!taskPreview.open)taskPreview.showModal();try{const result=await api('description?name='+encodeURIComponent(task.name));if(previewTask===task)previewDescription.textContent=result.text;}catch(error){if(previewTask===task)previewDescription.textContent='任务说明暂不可用：'+error.message;}});
         tile.dataset.task=task.name;makeTaskDraggable(tile,task);tile.setAttribute('aria-keyshortcuts','Alt+ArrowLeft Alt+ArrowRight Alt+ArrowUp Alt+ArrowDown');
         tile.addEventListener('keydown',event=>{if(!event.altKey||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;event.preventDefault();if(movingTask)return;const index=all.findIndex(t=>t.name===task.name);if(event.key==='ArrowLeft'||event.key==='ArrowRight'){const next=categories[categories.indexOf(category)+(event.key==='ArrowRight'?1:-1)];if(next)moveWorkspaceTask(task.name,next);}else if(event.key==='ArrowUp'&&index>0)moveWorkspaceTask(task.name,category,all[index-1].name);else if(event.key==='ArrowDown'&&index<all.length-1)moveWorkspaceTask(task.name,category,all[index+2]?.name||null);});
-        const symbol=icon(categorySymbols[category]);symbol.className='task-tile-icon';const handle=el('span','⠿','task-drag-handle');handle.setAttribute('aria-hidden','true');tile.append(symbol,el('span',task.name),handle);tile.title=task.name+'：点击查看说明；拖动可调整分类和顺序（也可使用 Alt + 方向键）';tiles.append(tile);
+        const symbol=icon(categorySymbols[category]);symbol.className='task-tile-icon';
+        if(taskIcons[task.name]){
+          const image=el('img');image.src=taskIcons[task.name].url;image.alt='';image.loading='lazy';image.draggable=false;
+          image.addEventListener('error',()=>{symbol.classList.remove('is-game-icon');symbol.replaceChildren(icon(categorySymbols[category]).firstChild);},{once:true});
+          symbol.classList.add('is-game-icon');symbol.replaceChildren(image);
+        }
+        const handle=el('span','⠿','task-drag-handle');handle.setAttribute('aria-hidden','true');tile.append(symbol,el('span',task.name),handle);tile.title=task.name+'：点击查看说明；拖动可调整分类和顺序（也可使用 Alt + 方向键）';tiles.append(tile);
       }
       if(!tasks.length)tiles.append(el('p',search?'没有匹配任务，仍可拖入':'将任务拖到这里','task-drop-empty'));
       group.append(tiles);host.append(group);
@@ -186,5 +193,6 @@
   }
   document.addEventListener('app:data',()=>{renderWorkspaceLibrary();enhanceFleet();loadFleetIdentity();});
   document.addEventListener('app:viewchange',event=>{if(event.detail==='devices'){enhanceFleet();loadFleetIdentity();}});
+  fetch('/static/task-icons/manifest.json',{cache:'no-store'}).then(response=>{if(!response.ok)throw new Error('icons unavailable');return response.json();}).then(icons=>{taskIcons=icons;workspaceSignature='';renderWorkspaceLibrary();}).catch(()=>{});
   renderWorkspaceLibrary();enhanceFleet();loadFleetIdentity();
 })();

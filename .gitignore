@@ -466,3 +466,13 @@ requirementsAndroid.txt
 # Local Web control state and credentials
 .web-data/
 .venv-web/
+
+# Private local credentials and release artifacts
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.zip
+*.sha256
+PACKAGE_MANIFEST.json

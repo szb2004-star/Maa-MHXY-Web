@@ -2,12 +2,14 @@
 // Sending requires live connection and game-scene checks on both client and server.
 const profileSend={profileId:null,selected:new Set(),errors:new Map(),sending:false,signature:'',readiness:new Map(),checking:false,checkSequence:0};
 function profileSendBlocked(device){
+  if(profileSend.checking)return '正在重新检测实例状态…';
+  const readiness=profileSend.readiness.get(device.id);
+  device={...device,...readiness?.device_state};
   if(device.run.active)return '正在执行配置';
   if(device.account_capture?.active)return '正在采集账号资料';
   if(state.powerPending.has(device.id)||['starting','launching_game','logging_in','stopping'].includes(device.power?.status))return '正在开关机或登录';
   if(state.assigning.has(device.id))return '正在切换任务配置';
   if(device.power?.supported&&!device.power.on)return device.power.status==='stopped'?'未开机':'无法确认开机状态';
-  const readiness=profileSend.readiness.get(device.id);
   if(!readiness)return profileSend.checking?'正在检查连接和游戏场景':'尚未检查连接和游戏场景';
   return readiness.ready?'':readiness.reason||'实例尚未就绪';
 }
@@ -30,7 +32,7 @@ function renderProfileSendTargets(){
   const host=$('#profile-send-targets');const focused=document.activeElement?.closest('.profile-send-target')?.dataset.id;host.replaceChildren();
   if(!state.devices.length)host.append(el('p','还没有实例，请先在模拟器总览添加。','muted'));
   for(const device of state.devices){
-    const blocked=profileSendBlocked(device);if(blocked&&!profileSend.sending)profileSend.selected.delete(device.id);const row=el('label',undefined,'profile-send-target');row.dataset.id=device.id;row.classList.toggle('is-blocked',!!blocked);row.classList.toggle('is-selected',profileSend.selected.has(device.id));
+    const blocked=profileSendBlocked(device);if(blocked&&!profileSend.sending&&!profileSend.checking)profileSend.selected.delete(device.id);const row=el('label',undefined,'profile-send-target');row.dataset.id=device.id;row.classList.toggle('is-blocked',!!blocked);row.classList.toggle('is-selected',profileSend.selected.has(device.id));
     const check=el('input');check.type='checkbox';check.checked=profileSend.selected.has(device.id);check.disabled=profileSend.sending||!!blocked;check.setAttribute('aria-label','发送到 '+device.name);
     const description=el('span',undefined,'profile-send-target-text');description.append(el('strong',device.name));const current=state.profiles.find(p=>p.id===device.profile_id);description.append(el('small','当前方案：'+(current?.name||'未选择')));
     if(profileSend.errors.has(device.id))description.append(el('small',profileSend.errors.get(device.id),'profile-send-error'));
@@ -43,11 +45,21 @@ function renderProfileSendTargets(){
   if(focused){const input=$(`[data-id="${CSS.escape(focused)}"] input`,host);if(input&&!input.disabled)input.focus({preventScroll:true});}
 }
 async function openProfileSend(profileId){
-  profileSend.profileId=profileId;profileSend.selected.clear();profileSend.errors.clear();profileSend.sending=false;profileSend.signature='';profileSend.readiness.clear();profileSend.checking=false;
+  const opening=++profileSend.checkSequence;
+  profileSend.profileId=profileId;profileSend.selected.clear();profileSend.errors.clear();profileSend.sending=false;profileSend.signature='';profileSend.readiness.clear();profileSend.checking=true;
   $('#profile-send-feedback').hidden=true;$('#profile-send-feedback').textContent='';
   if(!$('#profile-send-dialog').open)$('#profile-send-dialog').showModal();
   renderProfileSendTargets();
-  try{await refresh();await refreshProfileSendReadiness();}catch(error){const feedback=$('#profile-send-feedback');feedback.hidden=false;feedback.textContent='刷新实例状态失败：'+error.message;}
+  try{
+    await refresh();
+    if(opening!==profileSend.checkSequence||!$('#profile-send-dialog').open)return;
+    profileSend.checking=false;
+    await refreshProfileSendReadiness();
+  }catch(error){
+    if(opening!==profileSend.checkSequence||!$('#profile-send-dialog').open)return;
+    profileSend.checking=false;profileSend.readiness.clear();profileSend.signature='';renderProfileSendTargets();
+    const feedback=$('#profile-send-feedback');feedback.hidden=false;feedback.textContent='刷新实例状态失败：'+error.message;
+  }
 }
 $('#profile-send-all').addEventListener('change',event=>{
   for(const device of state.devices)if(!profileSendBlocked(device)){event.target.checked?profileSend.selected.add(device.id):profileSend.selected.delete(device.id);}
@@ -80,7 +92,7 @@ async function refreshProfileSendReadiness(){
   const key=profileSend.profileId,sequence=++profileSend.checkSequence;
   profileSend.checking=true;profileSend.signature='';renderProfileSendTargets();
   try{
-    const rows=await api('profiles/'+encodeURIComponent(key)+'/targets');
+    const rows=await api('profiles/'+encodeURIComponent(key)+'/targets',{cache:'no-store'});
     if(sequence!==profileSend.checkSequence||key!==profileSend.profileId||!$('#profile-send-dialog').open)return;
     profileSend.readiness=new Map(rows.map(row=>[row.id,row]));
   }catch(error){

@@ -83,37 +83,37 @@
 .monitor-notice strong{color:#1f6b52;font-weight:600}
 .monitor-notice-dot{width:7px;height:7px;border-radius:50%;background:#3aa383;flex:0 0 auto;box-shadow:0 0 0 3px #d9efe5}
 
-/* Little runner when working, breathing sleeper when idle. */
+/* Rabbit walking sprite: configuration execution is the only busy signal. */
 .card-title-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;row-gap:0}
 .card-title-row h2{min-width:0}
-.instance-activity{display:inline-flex;align-items:center;flex-shrink:0;height:36px;color:#3c8d76;cursor:help;vertical-align:middle}
+.instance-activity{position:relative;display:inline-flex;align-items:flex-end;justify-content:center;flex-shrink:0;width:49px;height:52px;cursor:help;vertical-align:middle;isolation:isolate}
 .instance-activity-label{display:none}
-.instance-activity-person{display:block;overflow:visible}
-.activity-runner{display:none}
-.instance-activity[data-busy="true"] .activity-runner{display:block}
-.instance-activity[data-busy="true"] .activity-sleeper{display:none}
-.runner-arm path,.runner-leg path{fill:none;stroke:#356d61;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
-.runner-arm-back path,.runner-leg-back path{stroke:#8bb5a9}
-.runner-shirt,.sleep-blanket{fill:#67a891}
-.runner-head circle,.sleep-head circle{fill:#f0c6a5}
-.person-hair{fill:#365852}
-.person-face{fill:none;stroke:#604f45;stroke-width:.9;stroke-linecap:round}
-.runner-ground,.sleep-ground{fill:none;stroke:#cddbd5;stroke-width:1.5;stroke-linecap:round}
-.runner-speed{fill:none;stroke:#9ac3b3;stroke-width:1.5;stroke-linecap:round;animation:runner-speed .7s ease-in-out infinite}
-.runner-body{animation:runner-bounce .7s ease-in-out infinite}
-.runner-leg{transform-origin:23px 23px;animation:runner-stride .7s ease-in-out infinite alternate}
-.runner-leg-back{animation-delay:-.7s}
-.runner-arm{transform-origin:25px 15px;animation:runner-stride .7s ease-in-out infinite alternate-reverse}
-.runner-arm-back{animation-delay:-.7s}
-.sleep-pillow{fill:#e7eee9;stroke:#ccdbd1;stroke-width:.7}
-.sleep-blanket-fold{fill:none;stroke:#4e8c76;stroke-width:1;stroke-linecap:round}
-.sleep-breath{transform-origin:24px 30px;animation:sleeper-breath 3.2s ease-in-out infinite}
-.sleep-z{fill:#74a08c;font:700 8px system-ui,sans-serif;animation:sleeper-snore 3.2s ease-in-out infinite;opacity:0}
-.sleep-z-two{font-size:9px;animation-delay:.7s}
-.sleep-z-three{font-size:10px;animation-delay:1.4s}
-@keyframes runner-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-@keyframes runner-stride{from{transform:rotate(-18deg)}to{transform:rotate(20deg)}}
-@keyframes runner-speed{0%,100%{opacity:.25;transform:translateX(1px)}50%{opacity:1;transform:translateX(-2px)}}
-@keyframes sleeper-breath{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.055)}}
-@keyframes sleeper-snore{0%,15%{opacity:0;transform:translate(0,3px)}40%,65%{opacity:1}100%{opacity:0;transform:translate(2px,-3px)}}
-@media(prefers-reduced-motion:reduce){.instance-activity-person *{animation:none!important}.sleep-z{opacity:1}}
+.instance-mascot{position:relative;display:block;width:45px;height:60px;flex-shrink:0;background-image:url('/static/mascot/rabbit-walk.png');background-size:180px 60px;background-position:-45px 0;background-repeat:repeat-x;transform:scaleX(-1);pointer-events:none;user-select:none;z-index:1}
+.instance-mascot-shadow{position:absolute;bottom:7px;left:50%;width:24px;height:4px;margin-left:-12px;background:#80643e20;border-radius:50%;filter:blur(1.5px);pointer-events:none}
+.instance-activity[data-busy="true"] .instance-mascot{animation:instance-rabbit-walk .64s steps(4,end) infinite}
+@keyframes instance-rabbit-walk{from{background-position:0 0}to{background-position:-180px 0}}
+@media(prefers-reduced-motion:reduce){.instance-activity .instance-mascot{animation:none!important;background-position:-45px 0}}
+
+/* Idle sleep symbols rise softly; configuration execution hides them. */
+.instance-sleep-symbol{position:absolute;left:29px;top:-5px;width:24px;height:29px;pointer-events:none;z-index:2;color:#9bafc6}
+.instance-sleep-symbol i{position:absolute;font-family:system-ui,sans-serif;font-weight:700;font-style:normal;line-height:1;opacity:0;animation:instance-sleep-drift 3s ease-in-out infinite;text-shadow:0 1px 2px #fff9}
+.instance-sleep-symbol i:nth-child(1){left:0;top:18px;font-size:9px}
+.instance-sleep-symbol i:nth-child(2){left:8px;top:9px;font-size:11px;animation-delay:.65s}
+.instance-sleep-symbol i:nth-child(3){left:17px;top:0;font-size:13px;animation-delay:1.3s}
+.instance-activity[data-busy="true"] .instance-sleep-symbol{display:none}
+@keyframes instance-sleep-drift{0%,10%{opacity:0;transform:translate(-2px,4px) scale(.85)}30%,60%{opacity:.9}100%{opacity:0;transform:translate(3px,-5px) scale(1.05)}}
+@media(prefers-reduced-motion:reduce){.instance-sleep-symbol i{animation:none;opacity:.8}}
+
+/* Sweat is visible only while a task configuration is executing. */
+.instance-sweat{display:none;position:absolute;left:32px;top:21px;width:16px;height:22px;pointer-events:none;z-index:3}
+.instance-activity[data-busy="true"] .instance-sweat{display:block}
+.instance-sweat i{position:absolute;left:1px;top:0;width:5px;height:7px;background:#82bed9;border-radius:70% 35% 65% 65%;opacity:0;animation:instance-sweat-fall 1.4s ease-in infinite;box-shadow:inset 1px 1px 0 #dff6ff99}
+.instance-sweat i:nth-child(2){left:8px;top:-3px;width:4px;height:6px;animation-delay:.7s}
+@keyframes instance-sweat-fall{0%{opacity:0;transform:translate(0,-2px) rotate(-25deg) scale(.7)}20%,50%{opacity:.9}100%{opacity:0;transform:translate(3px,10px) rotate(-25deg) scale(.95)}}
+@media(prefers-reduced-motion:reduce){.instance-sweat i{animation:none;opacity:.8;transform:rotate(-25deg)}}
+
+/* A little forward travel for the working rabbit, including its sweat and shadow. */
+.instance-activity{translate:0 0;transition:translate .4s ease}
+.instance-activity[data-busy="true"]{translate:8px 0;animation:instance-rabbit-travel 2.6s ease-in-out infinite}
+@keyframes instance-rabbit-travel{0%,100%{translate:8px 0}50%{translate:13px 0}}
+@media(prefers-reduced-motion:reduce){.instance-activity{transition:none}.instance-activity[data-busy="true"]{animation:none;translate:8px 0}}

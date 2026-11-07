@@ -193,9 +193,10 @@ class Manager:
             if profile_id not in self.profiles:
                 raise KeyError('任务配置不存在')
             package = self.catalog.game_package(self.profiles[profile_id]['resource'])
-        rows = self.list_with_power()
+        rows = self.list_with_power(force=True)
         def inspect(row):
-            return {'id': row['id'], **probe_ready(row, package)}
+            return {'id': row['id'], 'device_state': {field: row.get(field) for field in
+                    ('run', 'power', 'account_capture')}, **probe_ready(row, package)}
         # Only the send dialog polls this endpoint; the main device poll stays cheap.
         with ThreadPoolExecutor(max_workers=4) as executor:
             return list(executor.map(inspect, rows))
@@ -209,7 +210,7 @@ class Manager:
             if self.active(key) or key in self.power_operations or key in self.capture_operations:
                 raise ValueError('实例正在执行配置、开关机或采集，不能接收方案')
             package = self.catalog.game_package(self.profiles[profile_id]['resource'])
-        row = next((d for d in self.list_with_power() if d['id'] == key), None)
+        row = next((d for d in self.list_with_power(force=True) if d['id'] == key), None)
         if row is None:
             raise KeyError('设备不存在')
         result = probe_ready(row, package)
@@ -327,9 +328,9 @@ class Manager:
         with self.lock:
             return [{**self.effective_device(device), 'run': self.snapshot(key)} for key, device in self.devices.items()]
 
-    def list_with_power(self):
+    def list_with_power(self, *, force=False):
         rows = self.list()
-        if time.monotonic() - self.power_cache_at > 2 and self.power_scan_lock.acquire(blocking=False):
+        if (force or time.monotonic() - self.power_cache_at > 2) and self.power_scan_lock.acquire(blocking=force):
             try:
                 states = {}
                 groups = {(spec(d).get('kind', 'mumu'), spec(d)['app_path']) for d in rows if spec(d)}

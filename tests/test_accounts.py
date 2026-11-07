@@ -33,10 +33,10 @@ class AccountParserTests(unittest.TestCase):
         self.assertEqual(one_number([text('0')])['value'],0)
 
     def test_role_and_skill_levels_exclude_upgrade_costs(self):
-        self.assertEqual(role_header([text('即墨町悦 23级'),text('ID 805719385')]),
-                         {'role_name':'即墨町悦','role_id':'805719385','level':23})
-        split=role_header([text('即墨町悦 23级',300,80),text('ID',300,125),text('805719385',400,125)])
-        self.assertEqual(split['role_id'],'805719385')
+        self.assertEqual(role_header([text('测试角色 23级'),text('ID 246813579')]),
+                         {'role_name':'测试角色','role_id':'246813579','level':23})
+        split=role_header([text('测试角色 23级',300,80),text('ID',300,125),text('246813579',400,125)])
+        self.assertEqual(split['role_id'],'246813579')
         skills=skills_from_text([text('强身术60级')],('强身术',))
         self.assertEqual(skills[0]['level'],60)
         self.assertEqual(skills_from_text([text('强身术'),text('600',120)],('强身术',)),[])

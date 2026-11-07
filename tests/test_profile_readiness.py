@@ -79,6 +79,18 @@ class ReceiveProfileTests(unittest.TestCase):
     def tearDown(self):
         self.manager.close();self.temp.cleanup()
 
+    def test_every_target_request_forces_new_state_and_probe(self):
+        off={**self.row,'power':{'supported':True,'on':False,'status':'stopped'}}
+        with patch.object(self.manager,'list_with_power',side_effect=[[off],[self.row]]) as scan, patch('web.readiness.probe_ready',side_effect=[{'ready':False,'reason':'未开机'},{'ready':True,'reason':'ready'}]) as probe:
+            first=self.manager.profile_send_targets(self.profile['id'])
+            second=self.manager.profile_send_targets(self.profile['id'])
+        self.assertFalse(first[0]['ready'])
+        self.assertTrue(second[0]['ready'])
+        self.assertTrue(second[0]['device_state']['power']['on'])
+        self.assertEqual(scan.call_count,2)
+        for call in scan.call_args_list:self.assertEqual(call.kwargs,{'force':True})
+        self.assertEqual(probe.call_count,2)
+
     def test_remembered_login_success_does_not_bypass_live_check(self):
         self.manager.power_results[self.key]='ready'
         with patch.object(self.manager,'list_with_power',return_value=[self.row]),patch('web.readiness.probe_ready',return_value={'ready':False,'reason':'ADB 未连接'}):

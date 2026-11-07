@@ -61,7 +61,7 @@ function render() {
     let card = [...host.children].find(c => c.dataset.id === d.id);
     if (!card) {
       card = el('article', undefined, 'device-card'); card.dataset.id = d.id;
-      card.innerHTML = '<div class="card-head"><input type="checkbox"><div class="card-title"><div class="card-title-row"><h2></h2><span class="instance-activity" role="img"><svg class="instance-activity-person" viewBox="0 0 52 36" width="52" height="36" aria-hidden="true" focusable="false"><g class="activity-runner"><path class="runner-ground" d="M7 33h9m8 0h8m7 0h5"/><g class="runner-body"><g class="runner-arm runner-arm-back"><path d="M26 14l7 5 5-4"/></g><g class="runner-leg runner-leg-back"><path d="M23 23l7 4-3 5"/></g><g class="runner-leg runner-leg-front"><path d="M23 23l-6 7-7 1"/></g><path class="runner-shirt" d="M24 12q-5 0-6 9l7 4 5-9z"/><g class="runner-arm runner-arm-front"><path d="M24 15l-6 5-5-3"/></g><g class="runner-head"><circle cx="28" cy="7" r="5"/><path class="person-hair" d="M23 7a5 5 0 0 1 10-1l-4-2-2 3z"/><path class="person-face" d="M30 7h.1m-1 3 2-.5"/></g></g><path class="runner-speed" d="M6 12h7m-9 5h6m-2 5h5"/></g><g class="activity-sleeper"><path class="sleep-ground" d="M5 32h40"/><rect class="sleep-pillow" x="5" y="25" width="17" height="7" rx="3"/><g class="sleep-breath"><path class="sleep-blanket" d="M19 30v-9q10-8 19 1l5 8z"/><path class="sleep-blanket-fold" d="M23 20q3 3 2 9"/><g class="sleep-head"><circle cx="14" cy="23" r="6"/><path class="person-hair" d="M8 23a6 6 0 0 1 10-5l-5 1-1 4z"/><path class="person-face" d="M14 23q1 1 2 0m1 3h1"/></g></g><text class="sleep-z sleep-z-one" x="24" y="15">z</text><text class="sleep-z sleep-z-two" x="32" y="11">Z</text><text class="sleep-z sleep-z-three" x="41" y="7">Z</text></g></svg><span class="instance-activity-label" aria-hidden="true"></span></span></div><p></p></div><label class="power-control"><span></span><input type="checkbox" role="switch"><i></i></label></div><div class="card-body"><div class="task-line"><span></span><small></small></div><div class="progress"><i></i></div><div class="card-meta"><span></span><span></span></div><div class="task-detail"></div><div class="sub-progress"><i></i></div><div class="task-phase"></div></div><div class="card-actions"></div>';
+      card.innerHTML = '<div class="card-head"><input type="checkbox"><div class="card-title"><div class="card-title-row"><h2></h2><span class="instance-activity" role="img"><span class="instance-mascot-shadow" aria-hidden="true"></span><span class="instance-mascot" aria-hidden="true"></span><span class="instance-sweat" aria-hidden="true"><i></i><i></i></span><span class="instance-sleep-symbol" aria-hidden="true"><i>z</i><i>Z</i><i>Z</i></span><span class="instance-activity-label" aria-hidden="true"></span></span></div><p></p></div><label class="power-control"><span></span><input type="checkbox" role="switch"><i></i></label></div><div class="card-body"><div class="task-line"><span></span><small></small></div><div class="progress"><i></i></div><div class="card-meta"><span></span><span></span></div><div class="task-detail"></div><div class="sub-progress"><i></i></div><div class="task-phase"></div></div><div class="card-actions"></div>';
       $('.card-head>input', card).addEventListener('change', e => { e.target.checked ? state.selected.add(d.id) : state.selected.delete(d.id); render(); });
       const settings = button('⚙','icon-button device-settings-button',() => openDeviceSettings(d.id)); settings.setAttribute('aria-label','实例设置'); settings.title = '实例名称'; $('.card-head',card).append(settings);
       $('.power-control input',card).addEventListener('change',e=>guarded(()=>setDevicePower(d.id,e.target.checked)));
@@ -341,7 +341,7 @@ async function bootstrap() {
 }
 guarded(bootstrap);
 
-const activityState={runs:[],device:'',status:'all'};
+const activityState={runs:[],device:'',status:'all',mode:'tasks'};
 const activityLabels={starting:'启动中',running:'进行中',completed:'已完成',failed:'失败',stopped:'已停止',ready:'已就绪'};
 const activityTaskLabels={completed:'完成',failed:'失败',running:'进行中',pending:'等待',skipped:'未执行',stopped:'已停止'};
 function secondsBetween(from,to){const a=Date.parse(from),b=Date.parse(to);return Number.isFinite(a)&&Number.isFinite(b)?Math.max(0,(b-a)/1000):null;}
@@ -374,8 +374,10 @@ function taskFlag(task,stamp,medians){
 }
 function fmtClock(iso){const d=new Date(iso||0);if(Number.isNaN(d.getTime()))return '—';const now=new Date(),pad=n=>String(n).padStart(2,'0');const hm=pad(d.getHours())+':'+pad(d.getMinutes());return d.toDateString()===now.toDateString()?hm:(d.getMonth()+1)+'月'+d.getDate()+'日 '+hm;}
 async function loadActivity(){try{const data=await api('activity?limit=80');activityState.runs=data.runs||[];}catch(err){activityState.runs=activityState.runs||[];}renderActivity();}
-function renderActivity(){
+function renderActivityOverview(){
   if(state.view!=='activity')return;
+  $('#activity-empty h2').textContent='暂无符合条件的运行记录';
+  $('#activity-empty p').textContent='启动一次任务配置后，这里会记录整份配置的执行情况。';
   const select=$('#activity-device'),signature=state.devices.map(d=>d.id+'\u0000'+d.name).join('|');
   if(select.dataset.signature!==signature){
     const previous=activityState.device;
@@ -426,6 +428,61 @@ function renderActivity(){
     card.append(list);host.append(card);
   }
 }
+// Execution ledger: only tasks that actually started, grouped by emulator.
+function activityTaskEntries(runs,stamp){
+  const entries=[];
+  for(const run of runs){
+    for(const [index,task] of (run.tasks||[]).entries()){
+      if(!task.started_at)continue;
+      const live=task.status==='running';
+      entries.push({...task,run,index,seconds:live?secondsBetween(task.started_at,stamp):
+        (task.seconds??(task.finished_at?secondsBetween(task.started_at,task.finished_at):null))});
+    }
+  }
+  return entries.sort((a,b)=>Date.parse(b.started_at)-Date.parse(a.started_at));
+}
+function renderActivity(){
+  if(state.view!=='activity')return;
+  for(const b of $$('#activity-layout button')){const active=b.dataset.mode===activityState.mode;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));}
+  const rule=$('.activity-rule');rule.hidden=activityState.mode!=='overview';
+  if(activityState.mode==='overview'){renderActivityOverview();return;}
+  const select=$('#activity-device');
+  const devices=new Map(activityState.runs.map(run=>[run.device_id,run.device_name||'历史实例']));
+  for(const device of state.devices)devices.set(device.id,device.name);
+  const signature=JSON.stringify([...devices]);
+  if(select.dataset.signature!==signature){select.replaceChildren(new Option('全部实例',''));for(const [id,name] of devices)select.append(new Option(name,id));select.dataset.signature=signature;select.value=activityState.device;}
+  for(const b of $$('#activity-filters button'))b.classList.toggle('active',b.dataset.status===activityState.status);
+  const stamp=new Date().toISOString();
+  const entries=activityTaskEntries(activityState.runs,stamp).filter(task=>(!activityState.device||task.run.device_id===activityState.device)&&
+    (activityState.status==='all'||task.status===activityState.status));
+  const host=$('#activity-list');host.replaceChildren();
+  $('#activity-empty').hidden=entries.length>0;
+  $('#activity-empty h2').textContent='暂无符合条件的任务执行记录';
+  $('#activity-empty p').textContent='任务实际启动后，会在这里记录开始时间、结束时间和耗时。未启动的任务不计入明细。';
+  $('#activity-summary').textContent=entries.length?`${new Set(entries.map(task=>task.run.device_id)).size} 个实例 · ${entries.length} 条任务记录`:'';
+  const groups=new Map();
+  for(const task of entries){const id=task.run.device_id;if(!groups.has(id))groups.set(id,[]);groups.get(id).push(task);}
+  const timeCell=(stamp,empty)=>{const cell=el('td',undefined,'ledger-time');if(stamp){const time=el('time',fmtClock(stamp));time.dateTime=stamp;time.title=new Date(stamp).toLocaleString();cell.append(time);}else cell.textContent=empty;return cell;};
+  for(const [id,tasks] of groups){
+    const card=el('article',undefined,'activity-ledger');const heading=el('div',undefined,'ledger-heading');
+    const title=el('div');title.append(el('h2',devices.get(id)||tasks[0].run.device_name||'实例'),el('p',`${tasks.length} 条记录 · 按开始时间倒序`));
+    const running=tasks.filter(task=>task.status==='running').length,done=tasks.filter(task=>task.status==='completed').length;
+    heading.append(title,el('span',`完成 ${done} 项${running?' · 执行中 '+running+' 项':''}`,'ledger-count'));card.append(heading);
+    const scroll=el('div',undefined,'ledger-scroll');const table=el('table',undefined,'ledger-table');table.setAttribute('aria-label',(devices.get(id)||'实例')+'任务执行明细');
+    const head=el('thead');const labels=el('tr');for(const label of ['开始时间','任务','结束时间','耗时','结果'])labels.append(el('th',label));head.append(labels);table.append(head);
+    const body=el('tbody');
+    for(const task of tasks){
+      const row=el('tr');row.className=task.status==='running'?'is-running':'';
+      const name=el('td',undefined,'ledger-task-name');name.append(el('strong',task.name),el('small',task.run.profile_name||'独立运行'));
+      if(task.status==='failed'&&task.run.error){const details=el('details',undefined,'ledger-error');details.append(el('summary','失败原因'),el('p',task.run.error.replace(/^(?:ValueError|RuntimeError|Exception):\s*/,'')));name.append(details);}
+      const duration=el('td',fmtDuration(task.seconds),'ledger-duration');if(task.status==='running')duration.append(el('small','已运行'));
+      const result=el('td');result.append(el('span',activityTaskLabels[task.status]||task.status,'ledger-result '+task.status));
+      row.append(timeCell(task.started_at,'—'),name,timeCell(task.finished_at,task.status==='running'?'进行中':'—'),duration,result);body.append(row);
+    }
+    table.append(body);scroll.append(table);card.append(scroll);host.append(card);
+  }
+}
+for(const b of $$('#activity-layout button'))b.addEventListener('click',()=>{activityState.mode=b.dataset.mode;renderActivity();});
 $('#activity-device').addEventListener('change',event=>{activityState.device=event.target.value;renderActivity();});
 for(const b of $$('#activity-filters button'))b.addEventListener('click',()=>{activityState.status=b.dataset.status;renderActivity();});
 const updates={checking:false,info:null};
@@ -457,6 +514,7 @@ async function checkUpdate(auto){
     body.replaceChildren();
     const v=state.version;
     body.append(el('p','当前：项目 '+(v.local.version||'未知')+'（'+(v.local.commit||'?')+'）· 内核 MaaFw '+(v.kernel.installed||'未知'),'update-current'));
+    body.append(el('p','上游任务资源：'+(v.repository||'—')+'（只更新 assets 与 agent，web 界面以本地为准）','muted'));
     if(info.error){body.append(el('p',info.error,'activity-alert'));return;}
     body.append(el('p','最新：'+(info.latest||'未知'),'update-latest'));
     if(!info.has_update){body.append(el('p','已经是最新版本。','muted'));return;}

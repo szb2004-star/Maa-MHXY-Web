@@ -10,7 +10,7 @@ from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
-REPOSITORY = 'gitlihang/Maa_MHXY_MG'
+DEFAULT_REPOSITORY = 'gitlihang/Maa_MHXY_MG'
 USER_AGENT = 'Maa-MHXY-Web'
 
 
@@ -21,6 +21,28 @@ def _git(*args, timeout=20):
         message = (result.stderr or result.stdout).strip().splitlines()
         raise ValueError((message[-1] if message else 'git 命令失败')[:300])
     return result.stdout.strip()
+
+
+def upstream_repository():
+    """任务资源跟随 origin 远端（上游仓库），界面部分以本仓库为准。"""
+    try:
+        url = _git('remote', 'get-url', 'origin')
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return DEFAULT_REPOSITORY
+    match = re.search(r'github\.com[:/]([^/]+)/([^/.]+)', url)
+    return f'{match.group(1)}/{match.group(2)}' if match else DEFAULT_REPOSITORY
+
+
+def upstream_ref():
+    try:
+        return _git('rev-parse', '--abbrev-ref', '@{u}')
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return 'origin/main'
+
+
+def _dirty_paths():
+    output = _git('status', '--porcelain=v1', '-z')
+    return [item[3:] for item in output.split('\0') if len(item) > 3]
 
 
 def _version_key(tag):
@@ -53,15 +75,15 @@ def current():
         dirty = bool(_git('status', '--porcelain'))
     except (OSError, subprocess.SubprocessError, ValueError):
         return {'local': {'version': '', 'commit': '', 'date': '', 'branch': '', 'dirty': False, 'git': False},
-                'kernel': kernel_version, 'repository': REPOSITORY}
+                'kernel': kernel_version, 'repository': upstream_repository()}
     return {'local': {'version': tag, 'commit': commit, 'date': date, 'branch': branch,
                       'dirty': dirty, 'git': True},
-            'kernel': kernel_version, 'repository': REPOSITORY}
+            'kernel': kernel_version, 'repository': upstream_repository()}
 
 
 def _release_notes(tag, timeout=8):
     try:
-        request = Request(f'https://api.github.com/repos/{REPOSITORY}/releases/tags/{tag}',
+        request = Request(f'https://api.github.com/repos/{upstream_repository()}/releases/tags/{tag}',
                           headers={'User-Agent': USER_AGENT, 'Accept': 'application/vnd.github+json'})
         with urlopen(request, timeout=timeout) as response:
             payload = json.loads(response.read().decode('utf-8'))
@@ -96,6 +118,16 @@ def apply_update():
     if not info['local']['git']:
         raise ValueError('当前目录不是 git 仓库，无法自动更新')
     before = info['local']['version']
+    try:
+        incoming = set(_git('diff', '--name-only', 'HEAD', upstream_ref()).splitlines())
+        overlap = sorted(incoming & set(_dirty_paths()))
+        if overlap:
+            names = '、'.join(overlap[:5])
+            raise ValueError(f'上游要更新的文件里有本地未提交的改动：{names}，请先提交或备份后再更新')
+    except ValueError:
+        raise
+    except (OSError, subprocess.SubprocessError):
+        pass
     try:
         output = _git('pull', '--ff-only', timeout=300)
     except (OSError, subprocess.SubprocessError, ValueError) as exc:

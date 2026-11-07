@@ -1,0 +1,152 @@
+{
+  "师门任务": {
+    "url": "/static/task-icons/shimen.png",
+    "source": "activities.png",
+    "box": [
+      510,
+      165,
+      620,
+      275
+    ]
+  },
+  "捉鬼（混队）": {
+    "url": "/static/task-icons/zhuagui.png",
+    "source": "activities.png",
+    "box": [
+      1123,
+      165,
+      1233,
+      275
+    ]
+  },
+  "捉鬼任务-无限/手动选择执行几轮": {
+    "url": "/static/task-icons/zhuagui.png",
+    "source": "activities.png",
+    "box": [
+      1123,
+      165,
+      1233,
+      275
+    ]
+  },
+  "活跃领取": {
+    "url": "/static/task-icons/active-reward.png",
+    "source": "activities.png",
+    "box": [
+      632,
+      797,
+      742,
+      907
+    ]
+  },
+  "帮派签到": {
+    "url": "/static/task-icons/guild.png",
+    "source": "current.png",
+    "box": [
+      1464,
+      940,
+      1561,
+      1053
+    ]
+  },
+  "整理背包": {
+    "url": "/static/task-icons/bag.png",
+    "source": "current.png",
+    "box": [
+      1807,
+      820,
+      1917,
+      937
+    ]
+  },
+  "特殊助战": {
+    "url": "/static/task-icons/assist.png",
+    "source": "current.png",
+    "box": [
+      1686,
+      940,
+      1804,
+      1059
+    ]
+  },
+  "秘境降妖": {
+    "url": "/static/task-icons/mijing.png",
+    "source": "asset:mijing/mijing_rukou.png",
+    "box": [
+      13,
+      13,
+      83,
+      83
+    ]
+  },
+  "科举乡试": {
+    "url": "/static/task-icons/keju.png",
+    "source": "asset:richangdati/kejuxiangshi_weikaishi2.png",
+    "box": [
+      16,
+      22,
+      84,
+      90
+    ]
+  },
+  "三界奇缘": {
+    "url": "/static/task-icons/sanjie.png",
+    "source": "asset:richangdati/sanjieqiyuan_weikaishi3.png",
+    "box": [
+      20,
+      21,
+      90,
+      91
+    ]
+  },
+  "五行修业": {
+    "url": "/static/task-icons/wuxing.png",
+    "source": "asset:wuxing/wuxingxiuye1.png",
+    "box": [
+      9,
+      10,
+      79,
+      80
+    ]
+  },
+  "帮派任务": {
+    "url": "/static/task-icons/guild-task.png",
+    "source": "asset:bangpairenwu/rukou.png",
+    "box": [
+      10,
+      10,
+      80,
+      80
+    ]
+  },
+  "九黎演武": {
+    "url": "/static/task-icons/jiuli.png",
+    "source": "asset:wujian/jiuli_weikaishi1.png",
+    "box": [
+      5,
+      13,
+      73,
+      81
+    ]
+  },
+  "宝图任务": {
+    "url": "/static/task-icons/treasure.png",
+    "source": "activities.png",
+    "box": [
+      850,
+      791,
+      978,
+      919
+    ]
+  },
+  "挖宝图": {
+    "url": "/static/task-icons/treasure.png",
+    "source": "activities.png",
+    "box": [
+      850,
+      791,
+      978,
+      919
+    ]
+  }
+}
