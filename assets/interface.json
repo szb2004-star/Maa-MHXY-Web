@@ -1,0 +1,116 @@
+{
+    "interface_version": 2,
+    "contact": "CONTACT",
+    "license": "LICENSE",
+    "name": "Maa_MHXY_MG",
+    "github": "https://github.com/gitlihang/Maa_MHXY_MG",
+    "description": "欢迎使用Maa_MHXY_MG,新用户请先查阅文档及各个任务的说明（有的任务有说明），请查看齿轮中的选项设置后选择适合自己的，最后免责声明：本项目仅供学习交流使用，请勿用于商业用途，使用本项目即代表您同意免责声明。",
+    "mirrorchyan_rid": "Maa_MHXY_MG",
+    "mirrorchyan_multiplatform": true,
+    "controller": [
+        {
+            "name": "ADB",
+            "label": "模拟器",
+            "type": "Adb"
+        },
+        {
+            "name": "PlayCover",
+            "label": "PlayCover",
+            "type": "PlayCover",
+            "description": "部分任务存在兼容问题，不建议使用"
+        }
+    ],
+    "agent": {
+        "child_exec": "python",
+        "child_args": [
+            "./../agent/main.py",
+            "-u"
+        ]
+    },
+    "resource": [
+        {
+            "name": "官方混服",
+            "path": [
+                "./resource/base"
+            ],
+            "controller": [
+                "ADB"
+            ]
+        },
+        {
+            "name": "官服",
+            "path": [
+                "./resource/base",
+                "./resource/NeteaseServer"
+            ],
+            "controller": [
+                "ADB"
+            ]
+        },
+        {
+            "name": "九游",
+            "path": [
+                "./resource/base",
+                "./resource/9game"
+            ],
+            "controller": [
+                "ADB"
+            ]
+        },
+        {
+            "name": "playcover资源",
+            "path": [
+                "./resource/base",
+                "./resource/mac"
+            ],
+            "controller": [
+                "PlayCover"
+            ],
+            "description": "适用于Mac使用PlayCover的用户"
+        }
+    ],
+    "import": [
+        "tasks/5R_duiyuan.json",
+        "tasks/5R_duizhang_TR.json",
+        "tasks/5R_duizhang.json",
+        "tasks/bangpai_qiandao.json",
+        "tasks/bangpai_renwu.json",
+        "tasks/baotu_renwu.json",
+        "tasks/chongwuqifu.json",
+        "tasks/chuangjianduiwu.json",
+        "tasks/chushoushanghui.json",
+        "tasks/fuben69.json",
+        "tasks/fuben115.json",
+        "tasks/fuli_qiandao.json",
+        "tasks/gongfang_kaogu.json",
+        "tasks/haidi.json",
+        "tasks/huoli.json",
+        "tasks/huoyue_lingqu.json",
+        "tasks/jiayuan_zhengli.json",
+        "tasks/jiuliyanwu.json",
+        "tasks/kejuxiangshi.json",
+        "tasks/menpaichuangguan.json",
+        "tasks/mihunta.json",
+        "tasks/mijing_renwu.json",
+        "tasks/quweijianshang.json",
+        "tasks/renwulian.json",
+        "tasks/sanjieqiyuan.json",
+        "tasks/shimen_renwu.json",
+        "tasks/start.json",
+        "tasks/stop.json",
+        "tasks/TS_zhuzhan.json",
+        "tasks/tuichuduiwu.json",
+        "tasks/wabaotu_qingli.json",
+        "tasks/wuxingxiuye.json",
+        "tasks/yunbiao_renwu.json",
+        "tasks/zhengli_baibao.json",
+        "tasks/zhuogui_hundui.json",
+        "tasks/zhuoguirenwu.json",
+        "tasks/preset/all.json",
+        "tasks/preset/Captain.json",
+        "tasks/preset/other.json",
+        "tasks/preset/TeamMember.json",
+        "tasks/start_android.json",
+        "tasks/bangpai_shouhushou.json"
+    ]
+}

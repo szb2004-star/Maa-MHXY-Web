@@ -1,0 +1,9 @@
+{
+    "preset": [
+        {
+            "name": "全部任务",
+            "description": "全部任务",
+            "task": []
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+loguru
+MaaAgentBinary
+MaaFw==5.14.3
+numpy
+pillow
+StrEnum
+requests
+opencv-python-headless==4.10.0.84
+scikit-image

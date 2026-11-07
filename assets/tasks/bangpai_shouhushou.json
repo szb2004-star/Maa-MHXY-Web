@@ -1,0 +1,10 @@
+{
+    "task": [
+        {
+            "name": "帮派守护兽",
+            "entry": "bangpai_shouhushou",
+            "description": "退出队伍后回帮派找毕灵翁，到守护兽「培养」界面摆摊购买臭豆腐并喂满今日次数"
+        }
+    ],
+    "option": {}
+}

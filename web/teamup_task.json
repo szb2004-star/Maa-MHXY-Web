@@ -1,0 +1,7 @@
+{
+  "task": [{"name":"编组自动组队","entry":"WebAutoTeam","execution":"web_teamup","option":["编组组队设置"],"description":"./docs/description/web_auto_team.md"}],
+  "option": {"编组组队设置":{"type":"input","inputs":[
+    {"name":"好友编组","pipeline_type":"string","default":"自动组队","verify":"\\S(?:[^\\r\\n]{0,18}\\S)?"},
+    {"name":"等待秒数","pipeline_type":"int","default":"360","verify":"[1-9][0-9]{1,3}"}
+  ],"pipeline_override":{"WebAutoTeam":{"attach":{"group":"{好友编组}","wait_seconds":"{等待秒数}"}}}}}
+}

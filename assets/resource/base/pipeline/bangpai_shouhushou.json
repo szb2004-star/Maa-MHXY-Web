@@ -1,0 +1,442 @@
+{
+  "bangpai_shouhushou": {
+    "next": [
+      "[JumpBack]守护兽-退出队伍",
+      "守护兽-打开人物"
+    ]
+  },
+  "守护兽-退出队伍": {
+    "max_hit": 1,
+    "next": [
+      "退出队伍过度"
+    ]
+  },
+  "守护兽-打开人物": {
+    "pre_delay": 500,
+    "action": "Click",
+    "target": [
+      1229,
+      45,
+      1,
+      1
+    ],
+    "post_delay": 1800,
+    "next": [
+      "守护兽-人物面板",
+      "守护兽-重开人物"
+    ]
+  },
+  "守护兽-重开人物": {
+    "max_hit": 2,
+    "action": "Click",
+    "target": [
+      1229,
+      45,
+      1,
+      1
+    ],
+    "post_delay": 1800,
+    "next": [
+      "守护兽-人物面板"
+    ]
+  },
+  "守护兽-人物面板": {
+    "recognition": "OCR",
+    "expected": [
+      "人物属性",
+      "人物信息"
+    ],
+    "roi": [
+      280,
+      10,
+      720,
+      60
+    ],
+    "next": [
+      "守护兽-点信息"
+    ]
+  },
+  "守护兽-点信息": {
+    "recognition": "OCR",
+    "expected": [
+      "信息"
+    ],
+    "roi": [
+      1080,
+      250,
+      220,
+      140
+    ],
+    "action": "Click",
+    "target": true,
+    "post_delay": 1500,
+    "next": [
+      "守护兽-人物信息",
+      "守护兽-点信息重试"
+    ]
+  },
+  "守护兽-点信息重试": {
+    "max_hit": 2,
+    "action": "Click",
+    "target": [
+      1139,
+      307,
+      1,
+      1
+    ],
+    "post_delay": 1500,
+    "next": [
+      "守护兽-人物信息"
+    ]
+  },
+  "守护兽-人物信息": {
+    "recognition": "OCR",
+    "expected": [
+      "人物信息"
+    ],
+    "roi": [
+      280,
+      10,
+      720,
+      60
+    ],
+    "next": [
+      "守护兽-回帮派"
+    ]
+  },
+  "守护兽-回帮派": {
+    "recognition": "OCR",
+    "expected": [
+      "回帮派"
+    ],
+    "roi": [
+      860,
+      120,
+      260,
+      90
+    ],
+    "action": "Click",
+    "target": true,
+    "post_delay": 4000,
+    "next": [
+      "守护兽-关面板"
+    ]
+  },
+  "守护兽-关面板": {
+    "max_hit": 2,
+    "pre_delay": 500,
+    "action": "Click",
+    "target": [
+      1110,
+      50,
+      1,
+      1
+    ],
+    "post_delay": 1500,
+    "next": [
+      "守护兽-确认帮派"
+    ]
+  },
+  "守护兽-点帮派入口": {
+    "max_hit": 2,
+    "action": "Click",
+    "target": [
+      854,
+      668,
+      1,
+      1
+    ],
+    "post_delay": 2500,
+    "next": [
+      "守护兽-确认帮派"
+    ]
+  },
+  "守护兽-确认帮派": {
+    "recognition": "OCR",
+    "expected": [
+      "帮派地图"
+    ],
+    "roi": [
+      10,
+      10,
+      260,
+      80
+    ],
+    "next": [
+      "守护兽-找毕灵翁",
+      "守护兽-点帮派入口"
+    ]
+  },
+  "守护兽-找毕灵翁": {
+    "pre_delay": 1000,
+    "action": "Click",
+    "target": [
+      465,
+      352,
+      1,
+      1
+    ],
+    "post_delay": 2000,
+    "next": [
+      "守护兽-查看守护兽",
+      "守护兽-找毕灵翁重试"
+    ]
+  },
+  "守护兽-找毕灵翁重试": {
+    "max_hit": 3,
+    "action": "Click",
+    "target": [
+      465,
+      352,
+      1,
+      1
+    ],
+    "post_delay": 2000,
+    "next": [
+      "守护兽-查看守护兽"
+    ]
+  },
+  "守护兽-查看守护兽": {
+    "recognition": "OCR",
+    "expected": [
+      "查看守护兽"
+    ],
+    "roi": [
+      960,
+      390,
+      280,
+      150
+    ],
+    "action": "Click",
+    "target": true,
+    "post_delay": 2500,
+    "next": [
+      "守护兽-培养页签",
+      "守护兽-查看按钮重试"
+    ]
+  },
+  "守护兽-查看按钮重试": {
+    "max_hit": 2,
+    "action": "Click",
+    "target": [
+      1087,
+      456,
+      1,
+      1
+    ],
+    "post_delay": 2500,
+    "next": [
+      "守护兽-培养页签"
+    ]
+  },
+  "守护兽-培养页签": {
+    "recognition": "OCR",
+    "expected": [
+      "培养"
+    ],
+    "roi": [
+      1080,
+      260,
+      220,
+      140
+    ],
+    "action": "Click",
+    "target": true,
+    "post_delay": 1500,
+    "next": [
+      "守护兽-选臭豆腐",
+      "守护兽-培养页签重试"
+    ]
+  },
+  "守护兽-培养页签重试": {
+    "max_hit": 2,
+    "action": "Click",
+    "target": [
+      1142,
+      326,
+      1,
+      1
+    ],
+    "post_delay": 1500,
+    "next": [
+      "守护兽-选臭豆腐"
+    ]
+  },
+  "守护兽-选臭豆腐": {
+    "recognition": "TemplateMatch",
+    "template": "shouhushou/choudoufu.png",
+    "roi": [
+      600,
+      480,
+      160,
+      110
+    ],
+    "action": "Click",
+    "post_delay": 1200,
+    "next": [
+      "守护兽-点喂养"
+    ]
+  },
+  "守护兽-点喂养": {
+    "pre_delay": 500,
+    "action": "Click",
+    "target": [
+      982,
+      319,
+      1,
+      1
+    ],
+    "post_delay": 2500,
+    "next": [
+      "守护兽-摆摊购买",
+      "守护兽-喂养循环"
+    ]
+  },
+  "守护兽-摆摊购买": {
+    "recognition": "TemplateMatch",
+    "template": "shouhushou/baitan.png",
+    "roi": [
+      300,
+      0,
+      380,
+      70
+    ],
+    "next": [
+      "守护兽-买挂单",
+      "守护兽-关闭摆摊"
+    ]
+  },
+  "守护兽-买挂单": {
+    "max_hit": 5,
+    "pre_delay": 300,
+    "action": "Click",
+    "target": [
+      622,
+      225,
+      1,
+      1
+    ],
+    "post_delay": 900,
+    "next": [
+      "守护兽-按购买"
+    ]
+  },
+  "守护兽-按购买": {
+    "action": "Click",
+    "target": [
+      1003,
+      654,
+      1,
+      1
+    ],
+    "post_delay": 1600,
+    "next": [
+      "守护兽-确认购买",
+      "守护兽-摆摊购买"
+    ]
+  },
+  "守护兽-确认购买": {
+    "recognition": "OCR",
+    "expected": [
+      "确定",
+      "确认"
+    ],
+    "roi": [
+      400,
+      300,
+      480,
+      220
+    ],
+    "action": "Click",
+    "target": true,
+    "post_delay": 1200,
+    "next": [
+      "守护兽-摆摊购买"
+    ]
+  },
+  "守护兽-关闭摆摊": {
+    "max_hit": 3,
+    "pre_delay": 500,
+    "action": "Click",
+    "target": [
+      1119,
+      62,
+      1,
+      1
+    ],
+    "post_delay": 2000,
+    "next": [
+      "守护兽-喂养循环"
+    ]
+  },
+  "守护兽-喂养循环": {
+    "next": [
+      "守护兽-选臭豆腐喂",
+      "守护兽-补货",
+      "守护兽-结束"
+    ]
+  },
+  "守护兽-选臭豆腐喂": {
+    "max_hit": 5,
+    "recognition": "TemplateMatch",
+    "template": "shouhushou/choudoufu.png",
+    "roi": [
+      600,
+      480,
+      160,
+      110
+    ],
+    "action": "Click",
+    "target": true,
+    "post_delay": 800,
+    "next": [
+      "守护兽-喂一次"
+    ]
+  },
+  "守护兽-喂一次": {
+    "max_hit": 5,
+    "recognition": "TemplateMatch",
+    "template": "shouhushou/weiyang.png",
+    "roi": [
+      900,
+      260,
+      220,
+      120
+    ],
+    "action": "Click",
+    "target": true,
+    "post_delay": 3000,
+    "next": [
+      "守护兽-喂养循环"
+    ]
+  },
+  "守护兽-补货": {
+    "recognition": "TemplateMatch",
+    "template": "shouhushou/baitan.png",
+    "roi": [
+      300,
+      0,
+      380,
+      70
+    ],
+    "next": [
+      "守护兽-买挂单",
+      "守护兽-关闭摆摊"
+    ]
+  },
+  "守护兽-结束": {
+    "max_hit": 1,
+    "pre_delay": 500,
+    "action": "Click",
+    "target": [
+      1119,
+      62,
+      1,
+      1
+    ],
+    "post_delay": 1500,
+    "next": [
+      "panduan_zhujiemian"
+    ]
+  }
+}
